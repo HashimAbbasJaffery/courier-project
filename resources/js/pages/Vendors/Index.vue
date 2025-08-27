@@ -23,13 +23,14 @@ const showUpdateForm = ref(false);
 
 // Payment update form state
 const paymentUpdateForm = ref({
+    date: '',
     vendor_id: '',
     platform_id: '',
     item_name: '',
     purchase_cost: 0,
     item_price: 0,
     material_id: '',
-    advance_payment: 0
+    total_amount: 0
 });
 
 // Multiple items for payment update
@@ -59,6 +60,7 @@ const getMaterialPrice = (id) => {
 // Add new row to payment items
 const addPaymentRow = () => {
     const newItem = {
+        date: '',
         id: paymentItems.value.length + 1,
         vendor_id: '',
         platform_id: '',
@@ -66,7 +68,6 @@ const addPaymentRow = () => {
         purchase_cost: 0,
         item_price: 0,
         material_id: '',
-        advance_payment: 0
     };
     paymentItems.value.push(newItem);
 };
@@ -199,26 +200,25 @@ async function deleteVendor(e) {
 // Search payment function
 const searchPayment = async (e) => {
     e.preventDefault();
-    
+
     if (!paymentSearchQuery.value.trim()) {
         alert('Please enter a search term');
         return;
     }
-    
+
     try {
         isSearchingPayment.value = true;
         showUpdateForm.value = false;
-        
+
         console.log('Searching for:', {
             field: paymentSearchField.value,
             query: paymentSearchQuery.value.trim()
         });
-        
         // Search by specific field
         const response = await axios.get(`/api/shipments/search?field=${paymentSearchField.value}&query=${encodeURIComponent(paymentSearchQuery.value.trim())}`);
-        
+        const items = response.data?.data?.items || [];
         console.log('Search response:', response.data);
-        
+
         if (response.data.success && response.data.data) {
             foundPaymentData.value = response.data.data;
             showUpdateForm.value = true;
@@ -233,16 +233,34 @@ const searchPayment = async (e) => {
                 advance_payment: 0
             };
             // Initialize payment items with one row
-            paymentItems.value = [{
-                id: 1,
-                vendor_id: '',
-                platform_id: '',
-                item_name: '',
-                purchase_cost: 0,
-                item_price: 0,
-                material_id: '',
-                advance_payment: 0
-            }];
+
+            if(items.length > 0) {
+                items.forEach(item => {
+                    paymentItems.value.push({
+                        id: item.id,
+                        date: item.created_at?.split("T")[0] || '',
+                        vendor_id: item.vendor_id || '',
+                        platform_id: item.platform_id || '',
+                        item_name: item.item_name || '',
+                        purchase_cost: item.purchase_cost || 0,
+                        item_price: item.item_price || 0,
+                        material_id: item.material_id || '',
+                        total_amount: item.total_amount || 0
+                    });
+                })
+            } else {
+                paymentItems.value = [{
+                    date: '',
+                    id: 1,
+                    vendor_id: '',
+                    platform_id: '',
+                    item_name: '',
+                    purchase_cost: 0,
+                    item_price: 0,
+                    material_id: '',
+                    advance_payment: 0
+                }];
+            }
         } else {
             alert('No payment/shipment found with the provided details. Please try again.');
             foundPaymentData.value = null;
@@ -265,24 +283,31 @@ const searchPayment = async (e) => {
 // Update payment function
 const updatePayment = async (e) => {
     e.preventDefault();
-    
-    // Validate all items have required fields
-    const invalidItems = paymentItems.value.filter(item => 
-        !item.vendor_id || !item.platform_id || !item.item_name || 
-        !item.purchase_cost || !item.item_price || !item.material_id || !item.advance_payment
-    );
-    
+        // Helper: treat only null/undefined as invalid, but allow 0
+        const isEmpty = val => val === null || val === undefined || val === '';
+
+        const invalidItems = paymentItems.value.filter(item =>
+            isEmpty(item.vendor_id) ||
+            isEmpty(item.item_name) ||
+            isEmpty(item.purchase_cost) ||
+            isEmpty(item.item_price) ||
+            isEmpty(item.material_id)
+        );
+
+    console.log(invalidItems);
     if (invalidItems.length > 0) {
         alert('Please fill in all required fields for all items');
         return;
     }
-    
+
     try {
         isUpdatingPayment.value = true;
-        
+
         // Process all payment items
-        const promises = paymentItems.value.map(item => 
+        const promises = paymentItems.value.map(item =>
             axios.post('/api/shipments/payment/update', {
+                date: item.date || new Date().toISOString().split('T')[0],
+                id: item.id || null,
                 shipment_id: foundPaymentData.value.id,
                 vendor_id: item.vendor_id,
                 platform_id: item.platform_id,
@@ -290,13 +315,13 @@ const updatePayment = async (e) => {
                 purchase_cost: item.purchase_cost,
                 item_price: item.item_price,
                 material_id: item.material_id,
-                advance_payment: item.advance_payment
+                total_amount: item.total_amount
             })
         );
-        
+
         const responses = await Promise.all(promises);
         const allSuccessful = responses.every(response => response.data.success);
-        
+
         if (allSuccessful) {
             alert(`Payment details updated successfully for ${paymentItems.value.length} item(s)!`);
             // Reset form and close modal
@@ -374,7 +399,7 @@ onMounted(async () => {
     await getMaterials();
     initializeDataTable();
     is_loading.value = false;
-    
+
     // Add modal event listener to reset form when modal is hidden
     const updatePaymentModal = document.getElementById('updatePaymentModal');
     if (updatePaymentModal) {
@@ -485,7 +510,7 @@ watch(vendors, () => {
                     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updatePaymentModal">Update Payment</button>
                 </div>
             </div>
-            
+
             <!-- Loading overlay -->
             <div v-if="is_fetching" class="loading-overlay">
                 <div class="loading-spinner"></div>
@@ -595,15 +620,15 @@ watch(vendors, () => {
 
     <!-- Update Payment Modal -->
     <div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 95%; width: 95%;">
-            <div class="modal-content">
+        <div class="modal-dialog" style="max-width: 95%; width: 95%;">
+            <div class="modal-content" style="padding: 30px;">
                 <div class="modal-body p-0">
                     <button type="button" class="btn-close" @click="resetPaymentForm" data-bs-dismiss="modal"></button>
                     <div class="mb-6 text-center">
                         <h4 class="mb-2">Update Payment</h4>
                         <p class="text-muted">Search and update existing payment records</p>
                     </div>
-                    
+
                     <!-- Search Payment Form -->
                     <form @submit.prevent="searchPayment" class="row g-4 mb-4">
                         <div class="col-md-4">
@@ -708,13 +733,13 @@ watch(vendors, () => {
                                             <table class="table table-bordered align-middle" id="paymentItemsTable">
                                                 <thead class="table-light">
                                                     <tr>
+                                                        <th>Date</th>
                                                         <th>Vendor</th>
-                                                        <th>Platform</th>
                                                         <th>Product Name</th>
                                                         <th>Cost</th>
                                                         <th>Selling</th>
                                                         <th>Packaging Material</th>
-                                                        <th>Advance Payment</th>
+                                                        <th>Total Amount</th>
                                                         <th>Profit</th>
                                                         <th style="width:64px">
                                                             <button type="button" class="btn btn-sm btn-success" @click="addPaymentRow">+</button>
@@ -724,18 +749,13 @@ watch(vendors, () => {
                                                 <tbody>
                                                     <tr v-for="item in paymentItems" :key="item.id">
                                                         <td>
+                                                            <input type="date" v-model="item.date" class="form-control" required />
+                                                        </td>
+                                                        <td>
                                                             <select v-model="item.vendor_id" class="form-select" required>
                                                                 <option value="">Select Vendor</option>
                                                                 <option v-for="vendor in (vendors.data || [])" :key="vendor.id" :value="vendor.id">
                                                                     {{ vendor.name }}
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                        <td>
-                                                            <select v-model="item.platform_id" class="form-select" required>
-                                                                <option value="">Select Platform</option>
-                                                                <option v-for="platform in (platforms.data || [])" :key="platform.id" :value="platform.id">
-                                                                    {{ platform.name }}
                                                                 </option>
                                                             </select>
                                                         </td>
@@ -750,7 +770,7 @@ watch(vendors, () => {
                                                                 </option>
                                                             </select>
                                                         </td>
-                                                        <td><input type="number" step="0.01" v-model.number="item.advance_payment" class="form-control" required /></td>
+                                                        <td><input type="number" readonly :value="item.item_price" step="0.01" class="form-control" /></td>
                                                         <td>
                                                             <input
                                                                 type="number"
@@ -763,7 +783,7 @@ watch(vendors, () => {
                                                             <button type="button" class="btn btn-sm btn-danger" @click="removePaymentRow(item.id)" :disabled="paymentItems.length === 1">-</button>
                                                         </td>
                                                     </tr>
-                                                    
+
                                                     <!-- Totals Row -->
                                                     <tr class="table-totals">
                                                         <td class="totals-label">
@@ -778,14 +798,12 @@ watch(vendors, () => {
                                                         <td class="totals-value">
                                                             <strong>{{ formatCurrency(paymentItems.reduce((sum, item) => sum + (item.purchase_cost || 0), 0)) }}</strong>
                                                         </td>
-                                                        <td class="totals-value">
-                                                            <strong>{{ formatCurrency(paymentItems.reduce((sum, item) => sum + (item.item_price || 0), 0)) }}</strong>
-                                                        </td>
+
                                                         <td class="totals-value">
                                                             <strong>{{ formatCurrency(paymentItems.reduce((sum, item) => sum + getMaterialPrice(item.material_id), 0)) }}</strong>
                                                         </td>
                                                         <td class="totals-value">
-                                                            <strong>{{ formatCurrency(paymentItems.reduce((sum, item) => sum + (item.advance_payment || 0), 0)) }}</strong>
+                                                            <strong>{{ formatCurrency(paymentItems.reduce((sum, item) => sum + (item.item_price || 0), 0)) }}</strong>
                                                         </td>
                                                         <td class="totals-value">
                                                             <strong :class="{ 'text-danger': totalPaymentProfit < 0, 'text-success': totalPaymentProfit > 0 }">
@@ -805,16 +823,16 @@ watch(vendors, () => {
                                             <div v-for="item in paymentItems" :key="'m-' + item.id" class="item-card mb-3 p-3 border rounded">
                                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                                     <h6 class="mb-0">Item #{{ item.id }}</h6>
-                                                    <button 
-                                                        type="button" 
-                                                        @click="removePaymentRow(item.id)" 
+                                                    <button
+                                                        type="button"
+                                                        @click="removePaymentRow(item.id)"
                                                         class="btn btn-sm btn-outline-danger"
                                                         :disabled="paymentItems.length === 1"
                                                     >
                                                         <i class="ri-delete-bin-line"></i>
                                                     </button>
                                                 </div>
-                                                
+
                                                 <div class="row g-2">
                                                     <div class="col-6">
                                                         <label class="form-label small">Vendor</label>
@@ -822,15 +840,6 @@ watch(vendors, () => {
                                                             <option value="">Select Vendor</option>
                                                             <option v-for="vendor in (vendors.data || [])" :key="vendor.id" :value="vendor.id">
                                                                 {{ vendor.name }}
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <label class="form-label small">Platform</label>
-                                                        <select v-model="item.platform_id" class="form-select form-select-sm" required>
-                                                            <option value="">Select Platform</option>
-                                                            <option v-for="platform in (platforms.data || [])" :key="platform.id" :value="platform.id">
-                                                                {{ platform.name }}
                                                             </option>
                                                         </select>
                                                     </div>
@@ -856,8 +865,8 @@ watch(vendors, () => {
                                                         </select>
                                                     </div>
                                                     <div class="col-6">
-                                                        <label class="form-label small">Advance Payment</label>
-                                                        <input v-model="item.advance_payment" type="number" step="0.01" class="form-control form-control-sm" required />
+                                                        <label class="form-label small">Total Amount</label>
+                                                        <input :value="item.total_amount" type="number" step="0.01" class="form-control form-control-sm" />
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="alert alert-info mb-0 py-2">
@@ -866,7 +875,7 @@ watch(vendors, () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="text-center mt-3">
                                                 <button type="button" @click="addPaymentRow" class="btn btn-success">
                                                     <i class="ri-add-line me-1"></i>Add Item

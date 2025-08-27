@@ -53,7 +53,7 @@ const fetchOrderItems = async () => {
     try {
         is_loading.value = true;
         const response = await axios.get(`/api/vendors/${props.vendor.id}/order-items`);
-        
+
         if (response.data.success && response.data.data) {
             tableData.value = response.data.data.map(item => ({
                 id: item.id,
@@ -77,13 +77,13 @@ const fetchOrderItems = async () => {
 const savePayments = async () => {
     try {
         // Validate data before saving
-        const invalidRows = tableData.value.filter(row => 
+        const invalidRows = tableData.value.filter(row =>
             !row.date || !row.description || row.description.trim() === ''
         );
-        
+
         if (invalidRows.length > 0) {
             showNotificationModal(
-                'Validation Error', 
+                'Validation Error',
                 'Please fill in Date and Description for all rows before saving.',
                 'error'
             );
@@ -91,7 +91,7 @@ const savePayments = async () => {
         }
 
         is_saving.value = true;
-        
+
         // Prepare data for saving
         const paymentsData = tableData.value.map(row => ({
             id: row.id,
@@ -102,15 +102,13 @@ const savePayments = async () => {
             amount: row.amount || 0
         }));
 
-        console.log('Sending payment data:', paymentsData); // Debug log
-
         const response = await axios.post(`/api/vendors/${props.vendor.id}/save-payments`, {
             payments: paymentsData
         });
 
         if (response.data.success) {
             showNotificationModal(
-                'Success!', 
+                'Success!',
                 'Payments saved successfully!',
                 'success'
             );
@@ -118,7 +116,7 @@ const savePayments = async () => {
             await fetchOrderItems();
         } else {
             showNotificationModal(
-                'Error', 
+                'Error',
                 'Error saving payments: ' + response.data.message,
                 'error'
             );
@@ -126,7 +124,7 @@ const savePayments = async () => {
     } catch (error) {
         console.error('Error saving payments:', error);
         showNotificationModal(
-            'Error', 
+            'Error',
             'Error saving payments. Please try again.',
             'error'
         );
@@ -185,7 +183,7 @@ onMounted(async () => {
                     <i class="ri-arrow-left-line me-2"></i>Back to Vendors
                 </button>
             </div>
-            
+
             <div class="card-body">
                 <div v-if="is_loading" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
@@ -193,7 +191,7 @@ onMounted(async () => {
                     </div>
                     <p class="mt-3 text-muted">Loading transactions...</p>
                 </div>
-                
+
                 <div v-else>
                     <div class="d-flex justify-content-between mb-3">
                         <div>
@@ -209,7 +207,7 @@ onMounted(async () => {
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead class="table-light">
@@ -224,24 +222,24 @@ onMounted(async () => {
                             <tbody>
                                 <tr v-for="row in tableData" :key="row.id">
                                     <td>
-                                        <input 
-                                            v-model="row.date" 
-                                            type="date" 
+                                        <input
+                                            v-model="row.date"
+                                            type="date"
                                             class="form-control form-control-sm"
                                         />
                                     </td>
                                     <td>
-                                        <input 
-                                            v-model="row.description" 
-                                            type="text" 
+                                        <input
+                                            v-model="row.description"
+                                            type="text"
                                             class="form-control form-control-sm"
                                             placeholder="Enter description"
                                         />
                                     </td>
                                     <td>
-                                        <input 
-                                            v-model.number="row.debit" 
-                                            type="number" 
+                                        <input
+                                            v-model.number="row.debit"
+                                            type="number"
                                             step="0.01"
                                             class="form-control form-control-sm"
                                             @input="updateAmount(row)"
@@ -249,9 +247,9 @@ onMounted(async () => {
                                         />
                                     </td>
                                     <td>
-                                        <input 
-                                            v-model.number="row.credit" 
-                                            type="number" 
+                                        <input
+                                            v-model.number="row.credit"
+                                            type="number"
                                             step="0.01"
                                             class="form-control form-control-sm"
                                             @input="updateAmount(row)"
@@ -259,9 +257,9 @@ onMounted(async () => {
                                         />
                                     </td>
                                     <td>
-                                        <input 
-                                            :value="formatCurrency(row.amount)" 
-                                            type="text" 
+                                        <input
+                                            :value="formatCurrency(row.amount)"
+                                            type="text"
                                             class="form-control form-control-sm"
                                             readonly
                                             :class="{ 'text-danger': row.amount < 0, 'text-success': row.amount > 0 }"

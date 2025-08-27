@@ -7,6 +7,7 @@ use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\ShipmentController;
 use App\Models\Platform;
 use App\Models\Shipment;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,11 @@ Route::get("shipments/search", [ShipmentController::class, "search"])->name("shi
 Route::post("shipments/payment/update", [ShipmentController::class, "updatePayment"])->name("shipments.payment.update");
 Route::get("shipments/track/{trackingNumber}", [ShipmentController::class, "track"])->name("shipments.track");
 Route::get("shipments/{shipmentId}/vendors", [\App\Http\Controllers\Api\ShipmentVendorController::class, "getVendors"])->name("shipments.vendors");
+
+Route::get("vendor/{vendor}/items", function(Vendor $vendor) {
+    $items = \App\Models\OrderItem::where('vendor_id', $vendor->id)->get();
+    return response()->json($items);
+});
 
 Route::get('/user', function (Request $request) {
     return $request->user();

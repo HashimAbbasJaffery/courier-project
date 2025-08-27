@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
 class VendorController extends Controller
@@ -75,7 +76,7 @@ class VendorController extends Controller
 
             foreach ($payments as $payment) {
                 $orderItem = \App\Models\OrderItem::find($payment['id']);
-                
+
                 if ($orderItem && $orderItem->vendor_id == $vendorId) {
                     \Log::info('Updating order item', [
                         'id' => $orderItem->id,
@@ -85,7 +86,7 @@ class VendorController extends Controller
                         'debit' => $payment['debit'] ?? 0,
                         'credit' => $payment['credit'] ?? 0,
                     ]);
-                    
+
                     $orderItem->update([
                         'created_at' => $payment['date'],
                         'item_name' => $payment['description'],
@@ -93,6 +94,14 @@ class VendorController extends Controller
                         'payment' => $payment['credit'] ?? 0,
                     ]);
                     $updatedCount++;
+                } else {
+                    OrderItem::create([
+                        'vendor_id' => $vendorId,
+                        'created_at' => $payment['date'],
+                        'item_name' => $payment['description'],
+                        'purchase_cost' => $payment['debit'] ?? 0,
+                        'payment' => $payment['credit'] ?? 0,
+                    ]);
                 }
             }
 

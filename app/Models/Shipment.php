@@ -25,6 +25,7 @@ class Shipment extends Model
         return $this->hasOne(Payment::class);
     }
 
+
     protected static function booted() {
         static::creating(function($shipment) {
             if (!empty($shipment->slip_link)) {

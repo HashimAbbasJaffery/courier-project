@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Shipment;
 use Illuminate\Http\Request;
+use Log;
 
 class ShipmentController extends Controller
 {
@@ -40,7 +41,7 @@ class ShipmentController extends Controller
     public function search(Request $request) {
         $query = $request->get('query');
         $field = $request->get('field', 'order_id'); // Default to order_id if no field specified
-        
+
         if (!$query) {
             return response()->json([
                 'success' => false,
@@ -59,7 +60,7 @@ class ShipmentController extends Controller
 
         // Search by specific field
         $shipment = Shipment::where($field, 'LIKE', "%{$query}%")
-            ->with(['shippingCharges'])
+            ->with(['shippingCharges', 'items'])
             ->first();
 
         if (!$shipment) {
@@ -79,47 +80,58 @@ class ShipmentController extends Controller
         $request->validate([
             'shipment_id' => 'required|exists:shipments,id',
             'vendor_id' => 'required|exists:vendors,id',
-            'platform_id' => 'required|exists:platforms,id',
             'item_name' => 'required|string|max:255',
             'purchase_cost' => 'required|numeric|min:0',
             'item_price' => 'required|numeric|min:0',
             'material_id' => 'required|exists:materials,id',
-            'advance_payment' => 'required|numeric|min:0'
         ]);
 
         try {
             // Get the shipment
             $shipment = Shipment::findOrFail($request->shipment_id);
-            
+
             // Get material price for profit calculation
             $material = \App\Models\Material::findOrFail($request->material_id);
             $materialPrice = $material->price;
-            
+
             // Calculate profit
             $profit = $request->item_price - $request->purchase_cost - $materialPrice;
-            
-            // Create or update order item with payment details
-            $orderItem = \App\Models\OrderItem::updateOrCreate(
-                [
-                    'shipment_id' => $request->shipment_id,
+            $orderItem = \App\Models\OrderItem::where("id", $request->id)->where("shipment_id", $request->shipment_id)->first();
+
+
+            Log::info($request->all());
+
+            if($orderItem?->exists()) {
+                \App\Models\OrderItem::where("id", $request->id)->update([
+                    'created_at' => $request->date ?? now(),
                     'vendor_id' => $request->vendor_id,
-                    'platform_id' => $request->platform_id
-                ],
-                [
-                    'shipment_id' => $request->shipment_id,
-                    'vendor_id' => $request->vendor_id,
-                    'platform_id' => $request->platform_id,
                     'item_name' => $request->item_name,
                     'purchase_cost' => $request->purchase_cost,
                     'item_price' => $request->item_price,
                     'material_id' => $request->material_id,
-                    'advance_payment' => $request->advance_payment,
+                    'advance_payment' => 0,
                     'total_amount' => $request->item_price,
                     'profit' => $profit,
                     'material_price' => $materialPrice,
                     'updated_at' => now()
-                ]
-            );
+                ]);
+            } else {
+                \App\Models\OrderItem::create([
+                    'created_at' => $request->date ?? now(),
+                    'shipment_id' => $request->shipment_id,
+                    'vendor_id' => $request->vendor_id,
+                    'item_name' => $request->item_name,
+                    'purchase_cost' => $request->purchase_cost,
+                    'item_price' => $request->item_price,
+                    'material_id' => $request->material_id,
+                    'advance_payment' => 0,
+                    'total_amount' => $request->item_price,
+                    'profit' => $profit,
+                    'material_price' => $materialPrice,
+                    'updated_at' => now()
+                ]);
+            }
+
 
             return response()->json([
                 'success' => true,
@@ -140,7 +152,7 @@ class ShipmentController extends Controller
             // Use the LeopardCourier service to track the shipment
             $leopardCourier = app('leopard');
             $trackingData = $leopardCourier->track($trackingNumber);
-            
+
             if (isset($trackingData['status']) && $trackingData['status'] == 1) {
                 return response()->json([
                     'success' => true,
@@ -162,7 +174,7 @@ class ShipmentController extends Controller
 
     /**
      * Webhook endpoint to update shipment status from courier service
-     * 
+     *
      * Expected payload format:
      * {
      *   "data": [
@@ -175,7 +187,7 @@ class ShipmentController extends Controller
      *     }
      *   ]
      * }
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -211,7 +223,7 @@ class ShipmentController extends Controller
                     if ($shipment) {
                         // Store original status for logging
                         $originalStatus = $shipment->status;
-                        
+
                         // Update shipment status and last activity
                         $shipment->update([
                             "status" => $webhookData["status"],
@@ -276,10 +288,10 @@ class ShipmentController extends Controller
     //     if (!$signature) {
     //         return false;
     //     }
-    //     
+    //
     //     $payload = $request->getContent();
     //     $expectedSignature = hash_hmac('sha256', $payload, config('app.webhook_secret'));
-    //     
+    //
     //     return hash_equals($expectedSignature, $signature);
     // }
 }
