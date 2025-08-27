@@ -284,7 +284,7 @@ Route::get("debug-env", function() {
         'LEOPARD_API_KEY' => env('LEOPARD_API_KEY') ? 'SET' : 'NOT SET',
         'LEOPARD_API_PASSWORD' => env('LEOPARD_API_PASSWORD') ? 'SET' : 'NOT SET',
         'LEOPARD_ENV' => env('LEOPARD_ENV', 'NOT SET'),
-        'endpoint' => env('LEOPARD_ENV') === 'staging' 
+        'endpoint' => env('LEOPARD_ENV') === 'staging'
             ? 'https://merchantapistaging.leopardscourier.com/api'
             : 'https://merchantapi.leopardscourier.com/api'
     ]);
@@ -297,6 +297,8 @@ Route::get("materials", function() {
 Route::get("platforms", function() {
     return Inertia::render("Platforms/Index");
 })->name("platforms.index");
+
+
 
 Route::get("vendors", function() {
     return Inertia::render("Vendors/Index");
