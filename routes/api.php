@@ -9,6 +9,7 @@ use App\Models\Platform;
 use App\Models\Shipment;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/cities/{courier:courier_service}", [CourierController::class, "getCities"])->name("courier.cities");
@@ -36,6 +37,8 @@ Route::post("/vendor/{vendor}/delete", [\App\Http\Controllers\VendorController::
 // Get order items for a specific vendor
 Route::get("/vendors/{vendor}/order-items", [\App\Http\Controllers\VendorController::class, "getOrderItems"])->name("vendors.order-items.get");
 
+
+
 // Save payment changes for a vendor
 Route::post("/vendors/{vendor}/save-payments", [\App\Http\Controllers\VendorController::class, "savePayments"])->name("vendors.save-payments");
 
@@ -48,7 +51,7 @@ Route::get("shipments/{shipmentId}/vendors", [\App\Http\Controllers\Api\Shipment
 Route::get("vendor/{vendor}/items", function(Vendor $vendor) {
     $items = \App\Models\OrderItem::where('vendor_id', $vendor->id)->get();
     return response()->json($items);
-});
+})->name("vendor.items");
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -66,3 +69,14 @@ Route::post("/shipment/status/update", [ShipmentController::class, "updateStatus
     ->withoutMiddleware(['web']); // Explicitly exclude web middleware (which includes CSRF)
 
 Route::get("/shipment/{shipment}/activity", [ActivityController::class, "get"])->name("activity.get");
+
+
+Route::post("payment/{vendor}/vendor", function(Request $request, Vendor $vendor) {
+    $amount = $request->amount;
+    $vendor->items()->create([
+        "payment" => $amount,
+        "item_name" => "Payment"
+    ]);
+
+    return response()->json(["Payment has been created"]);
+})->name("payment.create");

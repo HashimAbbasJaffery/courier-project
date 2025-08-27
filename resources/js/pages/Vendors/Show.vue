@@ -169,6 +169,20 @@ const totalAmount = computed(() => {
     return totalDebit.value - totalCredit.value;
 });
 
+// Computed property for last total amount
+const lastTotalAmount = computed(() => {
+    return totalAmount.value;
+});
+
+// Computed property for last payment date
+const lastPaymentDate = computed(() => {
+    if (tableData.value.length === 0) {
+        return 'No payments yet';
+    }
+    const lastPayment = tableData.value[tableData.value.length - 1];
+    return lastPayment ? lastPayment.date : 'No payments yet';
+});
+
 onMounted(async () => {
     await fetchOrderItems();
 });
@@ -177,7 +191,20 @@ onMounted(async () => {
 <template>
     <div class="container-xxl container-p-y flex-grow-1">
         <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="vendor-header">
+                <h1 style="font-size: 25px; margin-bottom: 0px; padding-bottom: 0px;">{{ vendor.name }}</h1>
+                <div class="vendor-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Last Total Amount:</span>
+                        <span class="stat-value amount">{{ formatCurrency(lastTotalAmount) }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Last Payment Date:</span>
+                        <span class="stat-value date">{{ lastPaymentDate || 'No payments yet' }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-header d-flex align-items-center justify-content-between" style="padding-top: 0px; margin-top: 0px;">
                 <h5 class="card-header">Transactions</h5>
                 <button @click="goBack" class="btn btn-secondary">
                     <i class="ri-arrow-left-line me-2"></i>Back to Vendors
@@ -213,7 +240,7 @@ onMounted(async () => {
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 120px">Date</th>
-                                    <th>Description</th>
+                                    <th style="width: 200px">Description</th>
                                     <th style="width: 120px">Debit</th>
                                     <th style="width: 120px">Credit</th>
                                     <th style="width: 120px">Amount</th>
@@ -307,6 +334,44 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.vendor-header {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.vendor-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.stat-value.amount {
+    color: #198754;
+}
+
+.stat-value.date {
+    color: #0d6efd;
+}
+
 .card-header {
     background-color: #f8f9fa;
     border-bottom: 1px solid #dee2e6;

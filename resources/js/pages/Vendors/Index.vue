@@ -97,6 +97,89 @@ watch([() => paymentUpdateForm.value.item_price, () => paymentUpdateForm.value.p
     // This will trigger the computed property to recalculate
 }, { deep: true });
 
+// Make Payment Modal state
+const makePaymentForm = ref({
+    vendor_id: '',
+    amount: 0
+});
+
+// Submit payment function
+const submitPayment = async () => {
+    try {
+        const response = await axios.post(route('payment.create', { vendor: makePaymentForm.value.vendor_id }), {
+            amount: makePaymentForm.value.amount
+        });
+        
+        if (response.status === 200) {
+            // Show success modal
+            showSuccessModal();
+            
+            // Reset form
+            makePaymentForm.value = {
+                vendor_id: '',
+                amount: 0
+            };
+            
+            // Close payment modal
+            const modal = document.getElementById('makePaymentModal');
+            if (modal) {
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                if (bootstrapModal) {
+                    bootstrapModal.hide();
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Payment submission failed:', error);
+        alert('Payment submission failed. Please try again.');
+    }
+};
+
+// Show success modal
+const showSuccessModal = () => {
+    // Create and show success modal
+    const successModal = document.createElement('div');
+    successModal.className = 'modal fade';
+    successModal.id = 'successPaymentModal';
+    successModal.innerHTML = `
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0 text-center">
+                    <div class="w-100">
+                        <div class="success-icon mx-auto mb-3">
+                            <i class="ri-check-line"></i>
+                        </div>
+                        <h4 class="modal-title mb-2 fw-semibold text-success">Payment Successful!</h4>
+                        <p class="text-muted mb-0 small">Your payment has been processed</p>
+                    </div>
+                </div>
+                <div class="modal-body text-center pt-0">
+                    <div class="success-message">
+                        <i class="ri-money-dollar-circle-line text-success me-2"></i>
+                        <span class="fw-medium">Payment has been created successfully!</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 justify-content-center pt-0">
+                    <button type="button" class="btn btn-success btn-lg px-4 shadow-sm" data-bs-dismiss="modal">
+                        <i class="ri-check-line me-2"></i>Great!
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(successModal);
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(successModal);
+    modal.show();
+    
+    // Remove modal from DOM after it's hidden
+    successModal.addEventListener('hidden.bs.modal', () => {
+        document.body.removeChild(successModal);
+    });
+};
+
 
 async function getVendors() {
     try {
@@ -499,6 +582,110 @@ watch(vendors, () => {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Material Design Modal Styles */
+.payment-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white !important;
+    font-size: 24px;
+}
+
+.payment-icon i {
+    color: white !important;
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white !important;
+    font-size: 32px;
+    margin: 0 auto;
+}
+
+.modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem 1.5rem 0 1.5rem;
+}
+
+.form-select-lg, .input-group-lg .form-control {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-select-lg:focus, .input-group-lg .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    border-color: #dee2e6;
+}
+
+.btn-lg {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    transform: translateY(-1px);
+}
+
+.form-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.form-text {
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.success-message {
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8fff9 0%, #f0fff4 100%);
+    border-radius: 12px;
+    border: 1px solid #d4edda;
+}
 </style>
 <template>
     <div v-show="!is_loading" class="container-xxl container-p-y flex-grow-1">
@@ -507,6 +694,7 @@ watch(vendors, () => {
                 <h5 class="card-header">Manage Vendors</h5>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Add Vendor</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#makePaymentModal">Make Payment</button>
                     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updatePaymentModal">Update Payment</button>
                 </div>
             </div>
@@ -910,6 +1098,94 @@ watch(vendors, () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Make Payment Modal -->
+    <div class="modal fade" id="makePaymentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <div class="d-flex align-items-center">
+                        <div class="payment-icon me-3">
+                            <i class="ri-money-dollar-circle-line text-primary"></i>
+                        </div>
+                        <div>
+                            <h4 class="modal-title mb-1 fw-semibold text-dark">Make Payment</h4>
+                            <p class="text-muted mb-0 small">Record a new payment transaction</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body pt-4">
+                    <form @submit.prevent="submitPayment">
+                        <div class="form-group mb-4">
+                            <label for="payment_vendor_id" class="form-label fw-medium text-dark mb-2">
+                                <i class="ri-user-line me-2 text-muted"></i>Select Vendor
+                            </label>
+                            <select 
+                                v-model="makePaymentForm.vendor_id" 
+                                id="payment_vendor_id" 
+                                class="form-select form-select-lg border-2" 
+                                :class="makePaymentForm.vendor_id ? 'border-success' : 'border-light'"
+                                required
+                            >
+                                <option value="">Choose a vendor from the list...</option>
+                                <option 
+                                    v-for="vendor in vendors.data" 
+                                    :key="vendor.id" 
+                                    :value="vendor.id"
+                                    class="py-2"
+                                >
+                                    {{ vendor.name }}
+                                </option>
+                            </select>
+                            <div class="form-text text-muted small mt-1">
+                                <i class="ri-information-line me-1"></i>Select the vendor you want to make payment to
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-4" v-if="makePaymentForm.vendor_id">
+                            <label for="payment_amount" class="form-label fw-medium text-dark mb-2">
+                                <i class="ri-money-dollar-circle-line me-2 text-muted"></i>Payment Amount
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="ri-currency-line text-muted"></i>
+                                </span>
+                                <input 
+                                    v-model.number="makePaymentForm.amount" 
+                                    type="number" 
+                                    step="0.01" 
+                                    id="payment_amount" 
+                                    class="form-control border-start-0 ps-0" 
+                                    placeholder="0.00"
+                                    required
+                                />
+                            </div>
+                            <div class="form-text text-muted small mt-1">
+                                <i class="ri-information-line me-1"></i>Enter the payment amount in your local currency
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-3 pt-3">
+                            <button type="button" class="btn btn-outline-secondary btn-lg flex-fill" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-2"></i>Cancel
+                            </button>
+                            <button 
+                                type="submit" 
+                                class="btn btn-primary btn-lg flex-fill shadow-sm" 
+                                :disabled="!makePaymentForm.vendor_id || !makePaymentForm.amount"
+                            >
+                                <i class="ri-check-line me-2"></i>
+                                <span v-if="!makePaymentForm.vendor_id || !makePaymentForm.amount">Fill Required Fields</span>
+                                <span v-else>Submit Payment</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
