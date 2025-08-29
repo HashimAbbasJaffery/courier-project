@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export SRC="$PWD/public"
+    - export DEST="/home2/libaaspo/software.libaaspo.com"
+    - /bin/mkdir -p "$DEST"
+    - /usr/bin/rsync -av --delete --exclude="index.php" "$SRC"/ "$DEST"/
