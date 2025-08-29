@@ -27,7 +27,7 @@ Route::get("import", function() {
     set_time_limit(0);                    // disable PHP max execution time for this request
 ini_set('max_execution_time', '0');   // belt & suspenders
 ignore_user_abort(true);
-     $path = storage_path('app/up_to_date.csv');
+     $path = storage_path('app/today_data.csv');
 
     if (!is_readable($path)) {
         return 'CSV not readable';

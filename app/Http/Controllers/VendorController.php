@@ -7,8 +7,21 @@ use Illuminate\Http\Request;
 
 class VendorController extends Controller
 {
-    public function get() {
-        $vendors = \App\Models\Vendor::query()->get();
+    public function get(Request $request) {
+        $query = \App\Models\Vendor::query();
+        
+        // Apply date range filtering if provided
+        if ($request->has('date_from') && $request->has('date_to')) {
+            $dateFrom = $request->input('date_from');
+            $dateTo = $request->input('date_to');
+            
+            // Filter vendors based on their order items within the date range
+            $query->whereHas('items', function($q) use ($dateFrom, $dateTo) {
+                $q->whereBetween('created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+            });
+        }
+        
+        $vendors = $query->get();
 
         return \App\Http\Resources\VendorResource::collection($vendors);
     }
@@ -42,11 +55,20 @@ class VendorController extends Controller
         return response()->json(['message'=> '']);
     }
 
-    public function getOrderItems($vendorId) {
+    public function getOrderItems($vendorId, Request $request) {
         try {
-            $orderItems = \App\Models\OrderItem::where('vendor_id', $vendorId)
-                ->select('id', 'created_at', 'item_name', 'purchase_cost', 'payment')
-                ->get();
+            $query = \App\Models\OrderItem::where('vendor_id', $vendorId)
+                ->select('id', 'created_at', 'item_name', 'purchase_cost', 'payment');
+            
+            // Apply date range filtering if provided
+            if ($request->has('date_from') && $request->has('date_to')) {
+                $dateFrom = $request->input('date_from');
+                $dateTo = $request->input('date_to');
+                
+                $query->whereBetween('created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+            }
+            
+            $orderItems = $query->get();
 
             return response()->json([
                 'success' => true,

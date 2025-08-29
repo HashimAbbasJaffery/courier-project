@@ -73,9 +73,13 @@ Route::get("/shipment/{shipment}/activity", [ActivityController::class, "get"])-
 
 Route::post("payment/{vendor}/vendor", function(Request $request, Vendor $vendor) {
     $amount = $request->amount;
+    $date = $request->date;
+    
     $vendor->items()->create([
         "payment" => $amount,
-        "item_name" => "Payment"
+        "item_name" => "Payment",
+        "created_at" => $date,
+        "updated_at" => $date
     ]);
 
     return response()->json(["Payment has been created"]);

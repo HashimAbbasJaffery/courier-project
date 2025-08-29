@@ -69,25 +69,21 @@ class CourierController extends Controller
 
         $items = collect($request->items ?? [])
                     ->filter(function ($item) {
-                        // Remove if any property is empty
-                        return !collect($item)->contains(function ($value) {
-                            return empty($value); // allow "0" but not empty strings/null
-                        });
+                        // Only require vendor_id, all other fields are optional
+                        return !empty($item['vendor_id']);
                     })
                     ->values()
                     ->toArray();
 
-
-
-
         if(count($items) > 0) {
             foreach ($items as $item) {
                 $shipment->items()->create([
-                    "item_name" => $item['item_name'],
-                    "purchase_cost" => $item['purchase_cost'],
-                    "item_price" => $item['item_price'],
-                    "material_id" => $item['material_id'],
-                    "advance_payment" => $item['advance_payment']
+                    "vendor_id" => $item["vendor_id"],
+                    "item_name" => $item['item_name'] ?? null,
+                    "purchase_cost" => $item['purchase_cost'] ?? 0,
+                    "item_price" => $item['item_price'] ?? 0,
+                    "material_id" => $item['material_id'] ?? null,
+                    "advance_payment" => $item['advance_payment'] ?? 0
                 ]);
             }
         }
@@ -238,22 +234,22 @@ class CourierController extends Controller
 
         try {
             $leopardCourier = app('leopard');
-            
+
             $result = $leopardCourier->getShipperAdvice($data);
-            
+
             // Add some debugging
             \Log::info('Shipper Advice API Response', [
                 'request_data' => $data,
                 'api_result' => $result
             ]);
-            
+
             return response()->json($result);
         } catch (\Exception $e) {
             \Log::error('Shipper Advice API Error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to fetch shipper advice: ' . $e->getMessage(),

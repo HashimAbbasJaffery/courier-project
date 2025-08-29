@@ -149,6 +149,8 @@ const initializeDataTable = () => {
     const dt = $(id).DataTable({
     autoWidth: true,     // ✅ stop recalculating widths
     scrollX: true,
+    pageLength: 50,
+    lengthMenu: [[50, 100, 250, -1], [50, 100, 250, 'ALL']],
     columnDefs: [
         { targets: '_all', className: 'align-middle' } // keep vertical center
     ]

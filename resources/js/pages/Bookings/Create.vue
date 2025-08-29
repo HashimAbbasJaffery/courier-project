@@ -7,8 +7,14 @@ import { nextTick, onMounted, ref, watch, computed } from 'vue';
 
 import Multiselect from 'vue-multiselect';
 
+// Add Font Awesome CDN
+const fontAwesomeScript = document.createElement('script');
+fontAwesomeScript.src = 'https://kit.fontawesome.com/231b67747d.js';
+fontAwesomeScript.crossOrigin = 'anonymous';
+document.head.appendChild(fontAwesomeScript);
+
 const cities = ref([]);
-const selectedCity = ref([]);
+const selectedCity = ref("");
 const shipment_types = {
     EXPRESS: [
         ['OVERNIGHT', 'OVERNIGHT'],
@@ -115,11 +121,11 @@ const removeRow = (id) => {
 
 // Computed properties for totals
 const totalCost = computed(() => {
-    return items.value.reduce((sum, item) => sum + (item.purchase_cost || 0), 0);
+    return items.value.reduce((sum, item) => sum + (Number(item.purchase_cost) || 0), 0);
 });
 
 const totalSelling = computed(() => {
-    return items.value.reduce((sum, item) => sum + (item.item_price || 0), 0);
+    return items.value.reduce((sum, item) => sum + (Number(item.item_price) || 0), 0);
 });
 
 const totalPackagingMaterial = computed(() => {
@@ -127,12 +133,12 @@ const totalPackagingMaterial = computed(() => {
 });
 
 const totalAmount = computed(() => {
-    return items.value.reduce((sum, item) => sum + (item.item_price || 0), 0);
+    return items.value.reduce((sum, item) => sum + (Number(item.item_price) || 0), 0);
 });
 
 const totalProfit = computed(() => {
     return items.value.reduce((sum, item) => {
-        const itemProfit = (item.item_price || 0) - (item.purchase_cost || 0) - getMaterialPrice(item.material_id);
+        const itemProfit = (Number(item.item_price) || 0) - (Number(item.purchase_cost) || 0) - getMaterialPrice(item.material_id);
         return sum + itemProfit;
     }, 0);
 });
@@ -147,16 +153,23 @@ const formatCurrency = (amount) => {
 
 async function submit(event) {
     event.preventDefault();
-    console.log(items);
+    
+    // Validate that vendor_id is selected for all items
+    const invalidItems = items.value.filter(item => !item.vendor_id);
+    if (invalidItems.length > 0) {
+        alert('Please select a vendor for all items.');
+        return;
+    }
+    
     console.log(
         ...items.value.map((item) => ({
             vendor_id: item.vendor_id,
             platform_id: item.platform_id,
-            item_name: item.item_name,
-            purchase_cost: item.purchase_cost,
-            item_price: item.item_price,
-            material_id: item.material_id,
-            advance_payment: item.advance_payment,
+            item_name: item.item_name || '',
+            purchase_cost: item.purchase_cost || 0,
+            item_price: item.item_price || 0,
+            material_id: item.material_id || null,
+            advance_payment: item.advance_payment || 0,
         })),
     );
     is_loading.value = true;
@@ -174,15 +187,15 @@ async function submit(event) {
             consignee_address: commonForm.value.address,
             advance_payment: shipmentForm.value.advance_payment,
             special_instructions: shipmentForm.value.special_instructions,
-            vendor_id: vendor_id.value,
             platform_id: platform_id.value,
             items: items.value.map((item) => ({
-                item_name: item.item_name,
+                vendor_id: item.vendor_id,
+                item_name: item.item_name || '',
                 platform_id: '1',
-                purchase_cost: item.purchase_cost,
-                item_price: item.item_price,
-                material_id: item.material_id,
-                advance_payment: '1',
+                purchase_cost: item.purchase_cost || 0,
+                item_price: item.item_price || 0,
+                material_id: item.material_id || null,
+                advance_payment: item.advance_payment || 0,
             })),
         });
 
@@ -543,7 +556,7 @@ watch(selectedMaterial, (newValue) => {
           <th>Total Amount</th>
           <th>Profit</th>
           <th style="width:64px">
-            <button type="button" class="btn btn-sm btn-success" @click="addRow">+</button>
+            <button type="button" style="color: white;" class="btn btn-sm btn-success" @click="addRow">+</button>
           </th>
         </tr>
       </thead>
@@ -557,22 +570,22 @@ watch(selectedMaterial, (newValue) => {
               </option>
             </select>
           </td>
-          <td><input type="text" v-model="item.item_name" class="form-control" /></td>
-          <td><input type="number" step="0.01" v-model.number="item.purchase_cost" class="form-control" /></td>
-          <td><input type="number" step="0.01" v-model.number="item.item_price" class="form-control" /></td>
+          <td><input type="text" v-model="item.item_name" class="form-control" placeholder="Product Name (Optional)" /></td>
+          <td><input type="number" step="0.01" v-model.number="item.purchase_cost" class="form-control" placeholder="Cost (Optional)" /></td>
+          <td><input type="number" step="0.01" v-model.number="item.item_price" class="form-control" placeholder="Selling Price (Optional)" /></td>
           <td>
             <select v-model="item.material_id" class="form-select">
-              <option value="">Select Material</option>
+              <option value="">Select Material (Optional)</option>
               <option v-for="material in materials" :key="material.id" :value="material.id">
                 {{ material.name }}
               </option>
             </select>
           </td>
-          <td><input type="number" :value="item.item_price" class="form-control" readonly /></td>
+          <td><input type="number" :value="item.item_price || 0" class="form-control" readonly /></td>
           <td>
             <input
               type="number"
-              :value="parseInt(item.item_price - item.purchase_cost) - getMaterialPrice(item.material_id)"
+              :value="parseInt((item.item_price || 0) - (item.purchase_cost || 0)) - getMaterialPrice(item.material_id)"
               class="form-control"
               readonly
             />
@@ -644,23 +657,23 @@ watch(selectedMaterial, (newValue) => {
       </div>
       <div class="col-12">
         <label class="form-label">Product Name</label>
-        <input type="text" v-model="item.item_name" class="form-control" placeholder="e.g. T-Shirt" required />
+        <input type="text" v-model="item.item_name" class="form-control" placeholder="e.g. T-Shirt (Optional)" />
       </div>
 
       <div class="col-6">
         <label class="form-label">Cost</label>
-        <input type="number" step="0.01" v-model.number="item.purchase_cost" class="form-control" />
+        <input type="number" step="0.01" v-model.number="item.purchase_cost" class="form-control" placeholder="Cost (Optional)" />
       </div>
 
       <div class="col-6">
         <label class="form-label">Selling</label>
-        <input type="number" step="0.01" v-model.number="item.item_price" class="form-control" />
+        <input type="number" step="0.01" v-model.number="item.item_price" class="form-control" placeholder="Selling Price (Optional)" />
       </div>
 
       <div class="col-12">
         <label class="form-label">Packaging Material</label>
         <select v-model="item.material_id" class="form-select">
-          <option value="">Select Material</option>
+          <option value="">Select Material (Optional)</option>
           <option v-for="material in materials" :key="material.id" :value="material.id">
             {{ material.name }}
           </option>
@@ -669,14 +682,14 @@ watch(selectedMaterial, (newValue) => {
 
       <div class="col-6">
         <label class="form-label">Total</label>
-        <input type="number" :value="item.item_price" class="form-control" readonly />
+        <input type="number" :value="item.item_price || 0" class="form-control" readonly />
       </div>
 
       <div class="col-6">
         <label class="form-label">Profit</label>
         <input
           type="number"
-          :value="parseInt(item.item_price - item.purchase_cost) - getMaterialPrice(item.material_id)"
+          :value="parseInt((item.item_price || 0) - (item.purchase_cost || 0)) - getMaterialPrice(item.material_id)"
           class="form-control"
           readonly
         />
@@ -684,7 +697,7 @@ watch(selectedMaterial, (newValue) => {
 
       <div class="col-12">
         <label class="form-label">Advance Payment</label>
-        <input type="number" step="0.01" v-model.number="item.advance_payment" class="form-control" />
+        <input type="number" step="0.01" v-model.number="item.advance_payment" class="form-control" placeholder="Advance Payment (Optional)" />
       </div>
     </div>
   </div>
@@ -710,9 +723,11 @@ watch(selectedMaterial, (newValue) => {
                     @click="item_details = !item_details"
                     type="cancel"
                     class="btn btn-primary waves-effect waves-light d-flex align-items-center justify-content-center me-4"
-                    style="min-width: 120px; color: white;"
+                    style="min-width: 120px; color: white; gap: 10px; align-items: center;"
                 >
                 {{ item_details ? "Hide" : "Show" }} Chart
+                <i class="fas fa-chevron-down ms-1" v-if="!item_details"></i>
+                <i class="fas fa-chevron-up ms-1" v-else></i>
             </a>
                 <button type="reset" class="btn btn-outline-secondary waves-effect me-4">Cancel</button>
 

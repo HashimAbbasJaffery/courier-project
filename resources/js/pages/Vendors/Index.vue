@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { nextTick, onMounted, ref, watch, computed } from 'vue';
+import { nextTick, onMounted, ref, watch, computed, reactive } from 'vue';
 import axios from 'axios';
 
 const vendors = ref([]);
@@ -13,6 +13,24 @@ const is_loading = ref(true);
 const is_fetching = ref(false);
 const is_fetching_materials = ref(false);
 const is_fetching_platforms = ref(false);
+
+// ---- State ----
+const filters = reactive({
+    dateRange: getDefaultDateRange()
+});
+
+// Helper function to get default date range (today to last 7 days)
+function getDefaultDateRange() {
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    const formatDate = (date) => {
+        return date.toISOString().split('T')[0];
+    };
+
+    return `${formatDate(sevenDaysAgo)} - ${formatDate(today)}`;
+}
 
 // Update Payment state
 const paymentSearchQuery = ref('');
@@ -57,6 +75,13 @@ const getMaterialPrice = (id) => {
     return material ? material.price : 0;
 };
 
+// Helpers
+function clearAll() {
+    filters.dateRange = getDefaultDateRange();
+    // Refetch data with default date range
+    getVendors();
+}
+
 // Add new row to payment items
 const addPaymentRow = () => {
     const newItem = {
@@ -100,26 +125,33 @@ watch([() => paymentUpdateForm.value.item_price, () => paymentUpdateForm.value.p
 // Make Payment Modal state
 const makePaymentForm = ref({
     vendor_id: '',
-    amount: 0
+    amount: 0,
+    date: new Date().toISOString().split('T')[0] // Set default to today
 });
+
+// Loading state for payment submission
+const isSubmittingPayment = ref(false);
 
 // Submit payment function
 const submitPayment = async () => {
     try {
+        isSubmittingPayment.value = true;
         const response = await axios.post(route('payment.create', { vendor: makePaymentForm.value.vendor_id }), {
-            amount: makePaymentForm.value.amount
+            amount: makePaymentForm.value.amount,
+            date: makePaymentForm.value.date
         });
-        
+
         if (response.status === 200) {
             // Show success modal
             showSuccessModal();
-            
+
             // Reset form
             makePaymentForm.value = {
                 vendor_id: '',
-                amount: 0
+                amount: 0,
+                date: new Date().toISOString().split('T')[0]
             };
-            
+
             // Close payment modal
             const modal = document.getElementById('makePaymentModal');
             if (modal) {
@@ -128,10 +160,14 @@ const submitPayment = async () => {
                     bootstrapModal.hide();
                 }
             }
+
+            await getVendors();
         }
     } catch (error) {
         console.error('Payment submission failed:', error);
         alert('Payment submission failed. Please try again.');
+    } finally {
+        isSubmittingPayment.value = false;
     }
 };
 
@@ -167,13 +203,13 @@ const showSuccessModal = () => {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(successModal);
-    
+
     // Show the modal
     const modal = new bootstrap.Modal(successModal);
     modal.show();
-    
+
     // Remove modal from DOM after it's hidden
     successModal.addEventListener('hidden.bs.modal', () => {
         document.body.removeChild(successModal);
@@ -181,10 +217,22 @@ const showSuccessModal = () => {
 };
 
 
-async function getVendors() {
+async function getVendors(params = {}) {
     try {
         is_fetching.value = true;
-        const response = await axios.get(route('vendors.get'));
+
+        // Prepare query parameters for date filtering
+        const queryParams = {};
+        if (filters.dateRange && filters.dateRange.includes(' - ')) {
+            const [dateFrom, dateTo] = filters.dateRange.split(' - ');
+            queryParams.date_from = dateFrom;
+            queryParams.date_to = dateTo;
+        }
+
+        // Merge with any additional params passed
+        Object.assign(queryParams, params);
+
+        const response = await axios.get(route('vendors.get'), { params: queryParams });
         vendors.value = response.data;
     } catch (error) {
         console.error('Error fetching vendors:', error);
@@ -283,7 +331,6 @@ async function deleteVendor(e) {
 // Search payment function
 const searchPayment = async (e) => {
     e.preventDefault();
-
     if (!paymentSearchQuery.value.trim()) {
         alert('Please enter a search term');
         return;
@@ -302,6 +349,7 @@ const searchPayment = async (e) => {
         const items = response.data?.data?.items || [];
         console.log('Search response:', response.data);
 
+
         if (response.data.success && response.data.data) {
             foundPaymentData.value = response.data.data;
             showUpdateForm.value = true;
@@ -315,6 +363,8 @@ const searchPayment = async (e) => {
                 material_id: '',
                 advance_payment: 0
             };
+
+            paymentItems.value = [];
             // Initialize payment items with one row
 
             if(items.length > 0) {
@@ -488,6 +538,19 @@ onMounted(async () => {
     if (updatePaymentModal) {
         updatePaymentModal.addEventListener('hidden.bs.modal', resetPaymentForm);
     }
+
+    // Initialize daterangepicker exactly like vendors show page
+    nextTick(() => {
+        $('#daterange').daterangepicker({
+            locale: { format: 'YYYY-MM-DD' },
+            startDate: moment().subtract(7, 'days'),
+            endDate: moment()
+        }, function (start: any, end: any) {
+            filters.dateRange = `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}`;
+            // Manually trigger data fetch when date range is selected
+            getVendors();
+        });
+    });
 });
 
 
@@ -501,6 +564,13 @@ watch(vendors, () => {
     hasWatchedOnce = true;
   }
 });
+
+// Watch for filter changes and refetch data
+watch(filters, async (newFilters) => {
+    if (newFilters.dateRange) {
+        await getVendors();
+    }
+}, { deep: true });
 
 
 </script>
@@ -697,6 +767,24 @@ watch(vendors, () => {
                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#makePaymentModal">Make Payment</button>
                     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updatePaymentModal">Update Payment</button>
                 </div>
+            </div>
+
+            <!-- Page -->
+            <div class="card mb-4 p-3">
+                <form id="filterForm">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label><strong>Date Range:</strong></label>
+                            <input type="text" v-model="filters.dateRange" name="daterange" id="daterange" class="form-control" />
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button @click="clearAll" type="button" class="btn btn-outline-secondary">
+                                <i class="ri-refresh-line me-2"></i>
+                                Reset Date Filter
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <!-- Loading overlay -->
@@ -1119,24 +1207,24 @@ watch(vendors, () => {
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                
+
                 <div class="modal-body pt-4">
                     <form @submit.prevent="submitPayment">
                         <div class="form-group mb-4">
                             <label for="payment_vendor_id" class="form-label fw-medium text-dark mb-2">
                                 <i class="ri-user-line me-2 text-muted"></i>Select Vendor
                             </label>
-                            <select 
-                                v-model="makePaymentForm.vendor_id" 
-                                id="payment_vendor_id" 
-                                class="form-select form-select-lg border-2" 
+                            <select
+                                v-model="makePaymentForm.vendor_id"
+                                id="payment_vendor_id"
+                                class="form-select form-select-lg border-2"
                                 :class="makePaymentForm.vendor_id ? 'border-success' : 'border-light'"
                                 required
                             >
                                 <option value="">Choose a vendor from the list...</option>
-                                <option 
-                                    v-for="vendor in vendors.data" 
-                                    :key="vendor.id" 
+                                <option
+                                    v-for="vendor in vendors.data"
+                                    :key="vendor.id"
                                     :value="vendor.id"
                                     class="py-2"
                                 >
@@ -1147,7 +1235,24 @@ watch(vendors, () => {
                                 <i class="ri-information-line me-1"></i>Select the vendor you want to make payment to
                             </div>
                         </div>
-                        
+
+                        <div class="form-group mb-4" v-if="makePaymentForm.vendor_id">
+                            <label for="payment_date" class="form-label fw-medium text-dark mb-2">
+                                <i class="ri-calendar-line me-2 text-muted"></i>Payment Date
+                            </label>
+                            <input
+                                v-model="makePaymentForm.date"
+                                type="date"
+                                id="payment_date"
+                                class="form-control form-control-lg border-2"
+                                :class="makePaymentForm.date ? 'border-success' : 'border-light'"
+                                required
+                            />
+                            <div class="form-text text-muted small mt-1">
+                                <i class="ri-information-line me-1"></i>Select the date for this payment
+                            </div>
+                        </div>
+
                         <div class="form-group mb-4" v-if="makePaymentForm.vendor_id">
                             <label for="payment_amount" class="form-label fw-medium text-dark mb-2">
                                 <i class="ri-money-dollar-circle-line me-2 text-muted"></i>Payment Amount
@@ -1156,12 +1261,12 @@ watch(vendors, () => {
                                 <span class="input-group-text bg-light border-end-0">
                                     <i class="ri-currency-line text-muted"></i>
                                 </span>
-                                <input 
-                                    v-model.number="makePaymentForm.amount" 
-                                    type="number" 
-                                    step="0.01" 
-                                    id="payment_amount" 
-                                    class="form-control border-start-0 ps-0" 
+                                <input
+                                    v-model.number="makePaymentForm.amount"
+                                    type="number"
+                                    step="0.01"
+                                    id="payment_amount"
+                                    class="form-control border-start-0 ps-0"
                                     placeholder="0.00"
                                     required
                                 />
@@ -1170,18 +1275,20 @@ watch(vendors, () => {
                                 <i class="ri-information-line me-1"></i>Enter the payment amount in your local currency
                             </div>
                         </div>
-                        
+
                         <div class="d-flex gap-3 pt-3">
                             <button type="button" class="btn btn-outline-secondary btn-lg flex-fill" data-bs-dismiss="modal">
                                 <i class="ri-close-line me-2"></i>Cancel
                             </button>
-                            <button 
-                                type="submit" 
-                                class="btn btn-primary btn-lg flex-fill shadow-sm" 
-                                :disabled="!makePaymentForm.vendor_id || !makePaymentForm.amount"
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg flex-fill shadow-sm"
+                                :disabled="!makePaymentForm.vendor_id || !makePaymentForm.amount || !makePaymentForm.date || isSubmittingPayment"
                             >
-                                <i class="ri-check-line me-2"></i>
-                                <span v-if="!makePaymentForm.vendor_id || !makePaymentForm.amount">Fill Required Fields</span>
+                                <i v-if="!isSubmittingPayment" class="ri-check-line me-2"></i>
+                                <i v-else class="ri-loader-4-line me-2 animate-spin"></i>
+                                <span v-if="!makePaymentForm.vendor_id || !makePaymentForm.amount || !makePaymentForm.date">Fill Required Fields</span>
+                                <span v-else-if="isSubmittingPayment">Processing Payment...</span>
                                 <span v-else>Submit Payment</span>
                             </button>
                         </div>
@@ -1192,3 +1299,18 @@ watch(vendors, () => {
     </div>
 
 </template>
+
+<style scoped>
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+</style>

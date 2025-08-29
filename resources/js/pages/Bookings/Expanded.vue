@@ -250,10 +250,13 @@
                                       <td style="color: #000000; font-size: 12px;">{{ item.cost ? item.cost : 'N/A' }}</td>
                                       <td style="color: #000000; font-size: 12px;">{{ item.item_price ? item.item_price : 'N/A' }}</td>
                                       <td style="color: #000000; font-size: 12px;">{{ item.packaging_material || 'N/A' }}</td>
-                                      <td style="color: #000000; font-size: 12px;">{{ item.total_amount ? item.total_amount : 'N/A' }}</td>
+                                      <td style="color: #000000; font-size: 12px;">{{ item.item_price ? item.item_price : 'N/A' }}</td>
                                       <td style="color: #000000; font-size: 12px;">
-                                        <span v-if="item.profit" class="badge" style="background-color: #c8e6c2; color: #2e7d32;">
-                                          {{ item.profit }}
+                                        <span v-if="item.item_price && item.cost" class="badge" :style="{ 
+                                          backgroundColor: (item.item_price - item.cost) >= 0 ? '#c8e6c2' : '#ffcdd2', 
+                                          color: (item.item_price - item.cost) >= 0 ? '#2e7d32' : '#c62828' 
+                                        }">
+                                          {{ item.item_price - item.cost }}
                                         </span>
                                         <span v-else class="text-muted">N/A</span>
                                       </td>

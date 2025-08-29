@@ -65,7 +65,7 @@ import AppSidebar from '@/layouts/app/AppSidebarLayout.vue';
                                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);"
                                     data-bs-toggle="dropdown">
                                     <div class="avatar avatar-online">
-                                        <img src="{{ asset('assets/img/avatars/1.png') }}"
+                                        <img src="/assets/img/avatars/1.png"
                                             class="w-px-40 h-auto rounded-circle">
                                     </div>
                                 </a>
@@ -75,7 +75,7 @@ import AppSidebar from '@/layouts/app/AppSidebarLayout.vue';
                                             <div class="d-flex align-items-center">
                                                 <div class="flex-shrink-0 me-3">
                                                     <div class="avatar avatar-online">
-                                                        <img src="{{ asset('assets/img/avatars/1.png') }}"
+                                                        <img src="/assets/img/avatars/1.png"
                                                             class="w-px-40 h-auto rounded-circle">
                                                     </div>
                                                 </div>
