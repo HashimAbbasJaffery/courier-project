@@ -16,7 +16,7 @@ const is_fetching_platforms = ref(false);
 
 // ---- State ----
 const filters = reactive({
-    dateRange: getDefaultDateRange()
+    dateRange: ""
 });
 
 // Helper function to get default date range (today to last 7 days)
