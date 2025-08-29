@@ -71,7 +71,7 @@
     ]
   },
   "resources/js/app.ts": {
-    "file": "assets/app-D3meR34w.js",
+    "file": "assets/app-TtBnQqn0.js",
     "name": "app",
     "src": "resources/js/app.ts",
     "isEntry": true,
@@ -91,6 +91,7 @@
       "resources/js/pages/Platforms/Index.vue",
       "resources/js/pages/ShipperAdvice/Index.vue",
       "resources/js/pages/Vendors/Index.vue",
+      "resources/js/pages/Vendors/Show.vue",
       "resources/js/pages/Welcome.vue",
       "resources/js/pages/auth/ConfirmPassword.vue",
       "resources/js/pages/auth/ForgotPassword.vue",
@@ -103,11 +104,11 @@
       "resources/js/pages/settings/Profile.vue"
     ],
     "css": [
-      "assets/app-DsLT77D2.css"
+      "assets/app-Bvvojlvz.css"
     ]
   },
   "resources/js/pages/Advices/Index.vue": {
-    "file": "assets/Index-DsFBvg-3.js",
+    "file": "assets/Index-D_3-iVbg.js",
     "name": "Index",
     "src": "resources/js/pages/Advices/Index.vue",
     "isDynamicEntry": true,
@@ -122,7 +123,7 @@
     ]
   },
   "resources/js/pages/Bookings/Create.vue": {
-    "file": "assets/Create-DPByJCI0.js",
+    "file": "assets/Create-CPvLQCc8.js",
     "name": "Create",
     "src": "resources/js/pages/Bookings/Create.vue",
     "isDynamicEntry": true,
@@ -134,11 +135,11 @@
       "_ui-qR5y7ijB.js"
     ],
     "css": [
-      "assets/Create-So_y7aTO.css"
+      "assets/Create-DNC8Izpt.css"
     ]
   },
   "resources/js/pages/Bookings/Expanded.vue": {
-    "file": "assets/Expanded-DYdGJE0h.js",
+    "file": "assets/Expanded-Dd8QPcdu.js",
     "name": "Expanded",
     "src": "resources/js/pages/Bookings/Expanded.vue",
     "isDynamicEntry": true,
@@ -149,11 +150,11 @@
       "_ui-qR5y7ijB.js"
     ],
     "css": [
-      "assets/Expanded-CKPfc13s.css"
+      "assets/Expanded-BrXwM1YI.css"
     ]
   },
   "resources/js/pages/Bookings/Index.vue": {
-    "file": "assets/Index-ByCVmQep.js",
+    "file": "assets/Index-ByQCNazR.js",
     "name": "Index",
     "src": "resources/js/pages/Bookings/Index.vue",
     "isDynamicEntry": true,
@@ -164,11 +165,11 @@
       "_ui-qR5y7ijB.js"
     ],
     "css": [
-      "assets/Index-DYNvuD1X.css"
+      "assets/Index-1KMtT5Un.css"
     ]
   },
   "resources/js/pages/Bookings/Show.vue": {
-    "file": "assets/Show-PGcAMlyb.js",
+    "file": "assets/Show-CupVVGAt.js",
     "name": "Show",
     "src": "resources/js/pages/Bookings/Show.vue",
     "isDynamicEntry": true,
@@ -183,7 +184,7 @@
     ]
   },
   "resources/js/pages/Dashboard.vue": {
-    "file": "assets/Dashboard-D33eOUwb.js",
+    "file": "assets/Dashboard-BU356hVX.js",
     "name": "Dashboard",
     "src": "resources/js/pages/Dashboard.vue",
     "isDynamicEntry": true,
@@ -195,7 +196,7 @@
     ]
   },
   "resources/js/pages/Materials/Index.vue": {
-    "file": "assets/Index-CgyUc6be.js",
+    "file": "assets/Index-wl2ThqBL.js",
     "name": "Index",
     "src": "resources/js/pages/Materials/Index.vue",
     "isDynamicEntry": true,
@@ -210,7 +211,7 @@
     ]
   },
   "resources/js/pages/Platforms/Index.vue": {
-    "file": "assets/Index-CWco6FHK.js",
+    "file": "assets/Index-CsrUYbNW.js",
     "name": "Index",
     "src": "resources/js/pages/Platforms/Index.vue",
     "isDynamicEntry": true,
@@ -225,7 +226,7 @@
     ]
   },
   "resources/js/pages/ShipperAdvice/Index.vue": {
-    "file": "assets/Index-nxGzp8eS.js",
+    "file": "assets/Index-CfMayav7.js",
     "name": "Index",
     "src": "resources/js/pages/ShipperAdvice/Index.vue",
     "isDynamicEntry": true,
@@ -240,7 +241,7 @@
     ]
   },
   "resources/js/pages/Vendors/Index.vue": {
-    "file": "assets/Index-D5BdT7uQ.js",
+    "file": "assets/Index-BJOEd8YB.js",
     "name": "Index",
     "src": "resources/js/pages/Vendors/Index.vue",
     "isDynamicEntry": true,
@@ -251,7 +252,22 @@
       "_ui-qR5y7ijB.js"
     ],
     "css": [
-      "assets/Index-5ZHmt6e9.css"
+      "assets/Index-DGkEiEUh.css"
+    ]
+  },
+  "resources/js/pages/Vendors/Show.vue": {
+    "file": "assets/Show-DtZO2SHP.js",
+    "name": "Show",
+    "src": "resources/js/pages/Vendors/Show.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DCAUJ3rR.js",
+      "_data-C-1G2k3o.js",
+      "resources/js/app.ts",
+      "_ui-qR5y7ijB.js"
+    ],
+    "css": [
+      "assets/Show-DkyYqw1E.css"
     ]
   },
   "resources/js/pages/Welcome.vue": {
@@ -265,7 +281,7 @@
     ]
   },
   "resources/js/pages/auth/ConfirmPassword.vue": {
-    "file": "assets/ConfirmPassword-DmpQW5CE.js",
+    "file": "assets/ConfirmPassword-DV3lF1JX.js",
     "name": "ConfirmPassword",
     "src": "resources/js/pages/auth/ConfirmPassword.vue",
     "isDynamicEntry": true,
@@ -298,7 +314,7 @@
     ]
   },
   "resources/js/pages/auth/Login.vue": {
-    "file": "assets/Login-B1Qqy3yo.js",
+    "file": "assets/Login-CHFF5RSM.js",
     "name": "Login",
     "src": "resources/js/pages/auth/Login.vue",
     "isDynamicEntry": true,
@@ -330,7 +346,7 @@
     ]
   },
   "resources/js/pages/auth/ResetPassword.vue": {
-    "file": "assets/ResetPassword-CeLiBO8o.js",
+    "file": "assets/ResetPassword-C7f1NNeK.js",
     "name": "ResetPassword",
     "src": "resources/js/pages/auth/ResetPassword.vue",
     "isDynamicEntry": true,
@@ -346,7 +362,7 @@
     ]
   },
   "resources/js/pages/auth/VerifyEmail.vue": {
-    "file": "assets/VerifyEmail-B3MzNhfr.js",
+    "file": "assets/VerifyEmail-CUhIYvid.js",
     "name": "VerifyEmail",
     "src": "resources/js/pages/auth/VerifyEmail.vue",
     "isDynamicEntry": true,
@@ -360,7 +376,7 @@
     ]
   },
   "resources/js/pages/settings/Appearance.vue": {
-    "file": "assets/Appearance-Bw-FwJm_.js",
+    "file": "assets/Appearance-DPvquH7y.js",
     "name": "Appearance",
     "src": "resources/js/pages/settings/Appearance.vue",
     "isDynamicEntry": true,
@@ -375,7 +391,7 @@
     ]
   },
   "resources/js/pages/settings/Password.vue": {
-    "file": "assets/Password-CYtL9GCX.js",
+    "file": "assets/Password-Cei-LFQ6.js",
     "name": "Password",
     "src": "resources/js/pages/settings/Password.vue",
     "isDynamicEntry": true,
@@ -392,7 +408,7 @@
     ]
   },
   "resources/js/pages/settings/Profile.vue": {
-    "file": "assets/Profile-CUaFOU6C.js",
+    "file": "assets/Profile-B-XleZyw.js",
     "name": "Profile",
     "src": "resources/js/pages/settings/Profile.vue",
     "isDynamicEntry": true,
