@@ -24,7 +24,9 @@ Route::get("/cities", function() {
 
 
 Route::get("import", function() {
-    set_time_limit(0);                    // disable PHP max execution time for this request
+    set_time_limit(0);
+
+    // disable PHP max execution time for this request
 ini_set('max_execution_time', '0');   // belt & suspenders
 ignore_user_abort(true);
      $path = storage_path('app/today_data.csv');
@@ -36,6 +38,10 @@ ignore_user_abort(true);
     $handle = fopen($path, 'rb');
     if ($handle === false) {
         return 'Could not open file';
+    }
+
+    if(false) {
+
     }
 
     // --- detect delimiter ---

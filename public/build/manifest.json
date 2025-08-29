@@ -71,11 +71,7 @@
     ]
   },
   "resources/js/app.ts": {
-<<<<<<< HEAD
     "file": "assets/app-CnPM6qvA.js",
-=======
-    "file": "assets/app-DDeM6aGO.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "app",
     "src": "resources/js/app.ts",
     "isEntry": true,
@@ -108,19 +104,11 @@
       "resources/js/pages/settings/Profile.vue"
     ],
     "css": [
-<<<<<<< HEAD
       "assets/app-4kAO6syN.css"
     ]
   },
   "resources/js/pages/Advices/Index.vue": {
     "file": "assets/Index-C7evJ6Z9.js",
-=======
-      "assets/app-CLUM9Lqe.css"
-    ]
-  },
-  "resources/js/pages/Advices/Index.vue": {
-    "file": "assets/Index-Bsgsiz5Y.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Index",
     "src": "resources/js/pages/Advices/Index.vue",
     "isDynamicEntry": true,
@@ -135,11 +123,7 @@
     ]
   },
   "resources/js/pages/Bookings/Create.vue": {
-<<<<<<< HEAD
     "file": "assets/Create-hPSYnuC0.js",
-=======
-    "file": "assets/Create-BlUdVTW9.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Create",
     "src": "resources/js/pages/Bookings/Create.vue",
     "isDynamicEntry": true,
@@ -151,19 +135,11 @@
       "_ui-B1kR6gEw.js"
     ],
     "css": [
-<<<<<<< HEAD
       "assets/Create-X-_hMFAN.css"
     ]
   },
   "resources/js/pages/Bookings/Expanded.vue": {
     "file": "assets/Expanded-CgxEso2F.js",
-=======
-      "assets/Create-DNC8Izpt.css"
-    ]
-  },
-  "resources/js/pages/Bookings/Expanded.vue": {
-    "file": "assets/Expanded-1k0i_Hu6.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Expanded",
     "src": "resources/js/pages/Bookings/Expanded.vue",
     "isDynamicEntry": true,
@@ -174,19 +150,11 @@
       "_ui-B1kR6gEw.js"
     ],
     "css": [
-<<<<<<< HEAD
       "assets/Expanded-DOlnjgKQ.css"
     ]
   },
   "resources/js/pages/Bookings/Index.vue": {
     "file": "assets/Index-BgW4SQUw.js",
-=======
-      "assets/Expanded-BrXwM1YI.css"
-    ]
-  },
-  "resources/js/pages/Bookings/Index.vue": {
-    "file": "assets/Index-DxtOy_W9.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Index",
     "src": "resources/js/pages/Bookings/Index.vue",
     "isDynamicEntry": true,
@@ -197,19 +165,11 @@
       "_ui-B1kR6gEw.js"
     ],
     "css": [
-<<<<<<< HEAD
       "assets/Index-CUM_Nbq7.css"
     ]
   },
   "resources/js/pages/Bookings/Show.vue": {
     "file": "assets/Show-BMJvTrz8.js",
-=======
-      "assets/Index-1KMtT5Un.css"
-    ]
-  },
-  "resources/js/pages/Bookings/Show.vue": {
-    "file": "assets/Show-eiclAEpp.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Show",
     "src": "resources/js/pages/Bookings/Show.vue",
     "isDynamicEntry": true,
@@ -224,11 +184,7 @@
     ]
   },
   "resources/js/pages/Dashboard.vue": {
-<<<<<<< HEAD
     "file": "assets/Dashboard-nBv6soiH.js",
-=======
-    "file": "assets/Dashboard-BJd9jTbC.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Dashboard",
     "src": "resources/js/pages/Dashboard.vue",
     "isDynamicEntry": true,
@@ -240,11 +196,7 @@
     ]
   },
   "resources/js/pages/Materials/Index.vue": {
-<<<<<<< HEAD
     "file": "assets/Index-BVN1m9aj.js",
-=======
-    "file": "assets/Index-BY5AyAOD.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Index",
     "src": "resources/js/pages/Materials/Index.vue",
     "isDynamicEntry": true,
@@ -259,11 +211,7 @@
     ]
   },
   "resources/js/pages/Platforms/Index.vue": {
-<<<<<<< HEAD
     "file": "assets/Index-BT7cOIQI.js",
-=======
-    "file": "assets/Index-BybNjZRE.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Index",
     "src": "resources/js/pages/Platforms/Index.vue",
     "isDynamicEntry": true,
@@ -278,11 +226,7 @@
     ]
   },
   "resources/js/pages/ShipperAdvice/Index.vue": {
-<<<<<<< HEAD
     "file": "assets/Index-Zq5ARaiT.js",
-=======
-    "file": "assets/Index-Dhgp127x.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Index",
     "src": "resources/js/pages/ShipperAdvice/Index.vue",
     "isDynamicEntry": true,
@@ -297,11 +241,7 @@
     ]
   },
   "resources/js/pages/Vendors/Index.vue": {
-<<<<<<< HEAD
     "file": "assets/Index-WzXQsApr.js",
-=======
-    "file": "assets/Index-DnTiCpMV.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Index",
     "src": "resources/js/pages/Vendors/Index.vue",
     "isDynamicEntry": true,
@@ -312,24 +252,15 @@
       "_ui-B1kR6gEw.js"
     ],
     "css": [
-<<<<<<< HEAD
       "assets/Index-C_zjegIx.css"
     ]
   },
   "resources/js/pages/Vendors/Show.vue": {
     "file": "assets/Show-waTa6xjh.js",
-=======
-      "assets/Index-DGkEiEUh.css"
-    ]
-  },
-  "resources/js/pages/Vendors/Show.vue": {
-    "file": "assets/Show-DDwshKJM.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Show",
     "src": "resources/js/pages/Vendors/Show.vue",
     "isDynamicEntry": true,
     "imports": [
-<<<<<<< HEAD
       "_vendor-CEpDKWGO.js",
       "_data-C-1G2k3o.js",
       "resources/js/app.ts",
@@ -337,15 +268,6 @@
     ],
     "css": [
       "assets/Show-DEKsSz1F.css"
-=======
-      "_vendor-DCAUJ3rR.js",
-      "_data-C-1G2k3o.js",
-      "resources/js/app.ts",
-      "_ui-qR5y7ijB.js"
-    ],
-    "css": [
-      "assets/Show-DkyYqw1E.css"
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     ]
   },
   "resources/js/pages/Welcome.vue": {
@@ -359,11 +281,7 @@
     ]
   },
   "resources/js/pages/auth/ConfirmPassword.vue": {
-<<<<<<< HEAD
     "file": "assets/ConfirmPassword-B_uIOmlI.js",
-=======
-    "file": "assets/ConfirmPassword-DV3lF1JX.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "ConfirmPassword",
     "src": "resources/js/pages/auth/ConfirmPassword.vue",
     "isDynamicEntry": true,
@@ -396,11 +314,7 @@
     ]
   },
   "resources/js/pages/auth/Login.vue": {
-<<<<<<< HEAD
     "file": "assets/Login-D0sLC2lh.js",
-=======
-    "file": "assets/Login-DCIeDmNP.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Login",
     "src": "resources/js/pages/auth/Login.vue",
     "isDynamicEntry": true,
@@ -432,11 +346,7 @@
     ]
   },
   "resources/js/pages/auth/ResetPassword.vue": {
-<<<<<<< HEAD
     "file": "assets/ResetPassword-BhePcYRW.js",
-=======
-    "file": "assets/ResetPassword-C7f1NNeK.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "ResetPassword",
     "src": "resources/js/pages/auth/ResetPassword.vue",
     "isDynamicEntry": true,
@@ -452,11 +362,7 @@
     ]
   },
   "resources/js/pages/auth/VerifyEmail.vue": {
-<<<<<<< HEAD
     "file": "assets/VerifyEmail-DRLusX5D.js",
-=======
-    "file": "assets/VerifyEmail-CUhIYvid.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "VerifyEmail",
     "src": "resources/js/pages/auth/VerifyEmail.vue",
     "isDynamicEntry": true,
@@ -470,11 +376,7 @@
     ]
   },
   "resources/js/pages/settings/Appearance.vue": {
-<<<<<<< HEAD
     "file": "assets/Appearance-CCr6KM1z.js",
-=======
-    "file": "assets/Appearance-C52VD5ra.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Appearance",
     "src": "resources/js/pages/settings/Appearance.vue",
     "isDynamicEntry": true,
@@ -489,11 +391,7 @@
     ]
   },
   "resources/js/pages/settings/Password.vue": {
-<<<<<<< HEAD
     "file": "assets/Password-DZ41oF94.js",
-=======
-    "file": "assets/Password-DY1zzCtZ.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Password",
     "src": "resources/js/pages/settings/Password.vue",
     "isDynamicEntry": true,
@@ -510,11 +408,7 @@
     ]
   },
   "resources/js/pages/settings/Profile.vue": {
-<<<<<<< HEAD
     "file": "assets/Profile-CIIZDP2G.js",
-=======
-    "file": "assets/Profile-CLFC_X8i.js",
->>>>>>> e197d7202dac37024e971c7a62d2a9dae7e0094a
     "name": "Profile",
     "src": "resources/js/pages/settings/Profile.vue",
     "isDynamicEntry": true,
