@@ -694,7 +694,7 @@ watch(vendors, () => {
                 <h5 class="card-header">Manage Vendors</h5>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Add Vendor</button>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#makePaymentModal">Make</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#makePaymentModal">Make Layment</button>
                     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updatePaymentModal">Update Payment</button>
                 </div>
             </div>

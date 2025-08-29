@@ -1,0 +1,13 @@
+---
+deployment:
+  tasks:
+    # Set paths
+    - export SRC="$PWD/public"
+    - export DEST="/home2/libaaspo/software.libaaspo.com"
+
+    # Make sure target exists
+    - /bin/mkdir -p "$DEST"
+
+    # Copy everything from public/ EXCEPT index.php
+    # --delete keeps DEST in sync with SRC (optional: remove it if you don't want deletions)
+    - /usr/bin/rsync -av --delete --exclude="index.php" "$SRC"/ "$DEST"/
