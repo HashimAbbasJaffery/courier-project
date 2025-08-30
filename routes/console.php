@@ -49,13 +49,7 @@ Schedule::call(function () {
 
     $resp = $tracker->track($csv); // returns Illuminate\Http\Client\Response
 
-    if (! $resp->successful()) {
-        \Log::error('Track API failed: '.$resp->body());
-        return;
-    }
-
-    $data    = $resp->json();
-    $packets = $data['packet_list'] ?? [];
+    $packets = $resp;
 
     foreach ($packets as $packet) {
         $track = $packet['track_number'] ?? null;
@@ -71,7 +65,7 @@ Schedule::call(function () {
 
         $old = $shipment->status;
         if ($old === $new) continue; // no change, skip
-
+        Log::info("something has definited changed");
         // 5) Update status (preserve existing picking_time; only set if first time picked)
         $update = [
             'status' => $new,
@@ -81,8 +75,9 @@ Schedule::call(function () {
         if ($new === 'Shipment Picked' && is_null($shipment->picking_time)) {
             $update['picking_time'] = now();
         }
+        
         $shipment->forceFill($update)->save();
-
+        
         // 6) Email on change
         $subject = in_array($new, ['Pending','Being Return'], true)
             ? 'Delivery Failed - Zebtan Collection'
@@ -90,7 +85,7 @@ Schedule::call(function () {
 
         $cityName = $cityById[$shipment->destination_city] ?? 'Unknown City';
 
-        Mail::to('habbas21219@gmail.com')->queue(new ShipmentStatusChanged(
+        Mail::to('habbas21219@gmail.com')->send(new ShipmentStatusChanged(
             $shipment->order_id,
             $new,
             $shipment->consignee_name,
