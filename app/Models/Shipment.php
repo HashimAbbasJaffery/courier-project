@@ -53,6 +53,20 @@ class Shipment extends Model
                 "shipment_id" => $shipment->id,
             ]);
         });
+        
+        static::updated(function($shipment) {
+            $charges = resolve("leopard")->getCharges($shipment->tracking_number);
+            foreach($charges["data"] as $charge) {
+                $shipment->shippingCharges()->create([
+                    "shipment_id" => $shipment->id,
+                    ...$charge
+                ]);
+            }
+
+            Payment::create([
+                "shipment_id" => $shipment->id,
+            ]);
+        });
     }
     public function shippingCharges() {
         return $this->hasOne(Charge::class);
