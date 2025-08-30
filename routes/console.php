@@ -49,27 +49,28 @@ Schedule::call(function () {
 
     $resp = $tracker->track($csv); // returns Illuminate\Http\Client\Response
 
-    $packets = $resp;
-
+    $packets = $resp["packet_list"];
     foreach ($packets as $packet) {
         $track = $packet['track_number'] ?? null;
         $new   = $packet['booked_packet_status'] ?? null;
         if (! $track || ! $new) continue;
-
+    
         /** @var \App\Models\Shipment|null $shipment */
         $shipment = $byTrack->get($track);
+
         if (! $shipment) {
             \Log::warning("Unknown tracking number in response: {$track}");
             continue;
         }
 
         $old = $shipment->status;
+        Log::info($old . " === " . $new);
         if ($old === $new) continue; // no change, skip
         Log::info("something has definited changed");
         // 5) Update status (preserve existing picking_time; only set if first time picked)
         $update = [
             'status' => $new,
-            'last_actvity' => now(),
+            'last_activity' => now(),
         ];
 
         if ($new === 'Shipment Picked' && is_null($shipment->picking_time)) {
@@ -96,7 +97,7 @@ Schedule::call(function () {
             $subject
         ));
     }
-})->everyMinute();
+})->hourlyAt(15);
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
